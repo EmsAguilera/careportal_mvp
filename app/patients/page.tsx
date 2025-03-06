@@ -1,5 +1,5 @@
 async function getPatients() {
-    const res = await fetch('http://localhost:3000/api/patients', { cache: 'no-store' });
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/patients`, { cache: 'no-store' });
     const data = await res.json();
     return data.patients;
 }
