@@ -29,6 +29,7 @@ model Facility {
   servesCodeMax Int
   zipCode Int
   capacity Boolean
+  patients   Patient[]
 }
 
 model Patient {
@@ -40,4 +41,6 @@ model Patient {
   careTypeId Int
   createdAt  DateTime @default(now())
   matchStatus Boolean
+  facility   Facility? @relation(fields: [facilityId], references: [id])
+  facilityId String?
 }

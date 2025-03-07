@@ -99,7 +99,6 @@ async function main() {
       capacity: true,
     },
   })
-  console.log({ stationary, ambulatory, stationary_ambulatory, dayCare })
 }
 main()
   .then(async () => {

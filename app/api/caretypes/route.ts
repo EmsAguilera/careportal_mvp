@@ -4,7 +4,11 @@ import { db } from "@/lib/prisma";
 export async function GET() {
   try {
     const careTypes = await db.careType.findMany({
-        
+      where: {
+        id: {
+          not: 3,
+        },
+      }
     });
     return NextResponse.json(careTypes);
   } catch (error) {

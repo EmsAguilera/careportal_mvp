@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { log } from "console";
 
 interface CareType {
   id: string;
@@ -18,6 +20,7 @@ const MultiStepForm = () => {
   const [message, setMessage] = useState("");
 
   const [errors, setErrors] = useState<{ name?: string; lastName?: string; zipCode?: string; careTypeId?: string }>({});
+  const router = useRouter();
 
   // Fetch care types on component mount
   useEffect(() => {
@@ -79,14 +82,16 @@ const MultiStepForm = () => {
       }
 
       const data = await response.json();
-      setMessage(data.message);
-      setStep(4);
+      console.log(data);
+      
+      
+      router.push(`/matches?id=${encodeURIComponent(data.patient.id)}`);
+      
     } catch (error) {
       setMessage("Error submitting form");
       console.error("Form submission error:", error);
     } finally {
       setLoading(false);
-      setStep(4); // Move to final step
     }
   };
 
@@ -112,7 +117,7 @@ const MultiStepForm = () => {
           ))}
         </div>
 
-        <h2 className="text-xl font-semibold mb-4">Patient Registration</h2>
+        <h2 className="text-xl font-semibold mb-4">Registration</h2>
 
         {/* Form Content */}
         {step === 1 && (
@@ -193,15 +198,6 @@ const MultiStepForm = () => {
             </button>
           )}
         </div>
-
-        {step === 4 && (
-          <div>
-            <h3 className="text-lg font-semibold">{message}</h3>
-            <button onClick={() => setStep(1)} className="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
-              Register Again
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );

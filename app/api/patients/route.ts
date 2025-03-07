@@ -40,6 +40,7 @@ export async function POST(req: NextRequest) {
         let status= false;
         let success = false;
         let message = "";
+        let matchedFacility = null;
 
         if(validatedData.careTypeId !== 4){
             const facilities = await db.facility.findMany({
@@ -58,18 +59,20 @@ export async function POST(req: NextRequest) {
                 if(validatedData.zipCode <= facility.servesCodeMax && validatedData.zipCode >= facility.servesCodeMin){
                     if(Math.abs(validatedData.zipCode - facility.zipCode) <= 3000){
                         status= true;
+                        matchedFacility= facility.id;
                         success = true;
                         message = 'Matching facility found! with Facility: ' + facility.name;
                         break;
                     }
                 }
                 status= false;
+                matchedFacility= null;
                 success = false;
                 message = "No matching facility found.";
             }
-            console.log(facilities);
         }else{
             status= false;
+            matchedFacility= null;
             success = false;
             message = "No matching facility found.";
         }
@@ -80,7 +83,8 @@ export async function POST(req: NextRequest) {
                 lastName: validatedData.lastName, 
                 zipCode: validatedData.zipCode, 
                 careTypeId: validatedData.careTypeId, 
-                matchStatus: status 
+                matchStatus: status,
+                facilityId: matchedFacility,
             },
         });
         return NextResponse.json({

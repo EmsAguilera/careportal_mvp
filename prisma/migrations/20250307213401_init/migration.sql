@@ -28,6 +28,7 @@ CREATE TABLE "Patient" (
     "careTypeId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "matchStatus" BOOLEAN NOT NULL,
+    "facilityId" TEXT,
 
     CONSTRAINT "Patient_pkey" PRIMARY KEY ("id")
 );
@@ -43,3 +44,6 @@ ALTER TABLE "Facility" ADD CONSTRAINT "Facility_careTypeId_fkey" FOREIGN KEY ("c
 
 -- AddForeignKey
 ALTER TABLE "Patient" ADD CONSTRAINT "Patient_careTypeId_fkey" FOREIGN KEY ("careTypeId") REFERENCES "CareType"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Patient" ADD CONSTRAINT "Patient_facilityId_fkey" FOREIGN KEY ("facilityId") REFERENCES "Facility"("id") ON DELETE SET NULL ON UPDATE CASCADE;
