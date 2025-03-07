@@ -1,5 +1,18 @@
 import { db } from '@/lib/prisma';
-import { NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+
+const prisma = new PrismaClient();
+
+const patientSchema = z.object({
+    name: z.string().min(1, "First name is required"),
+    lastName: z.string().min(1, "Last name is required"),
+    zipCode: z.number().int().refine((val) => val.toString().length === 5, {
+      message: "Zipcode must be exactly 5 digits",
+    }),
+    careTypeId: z.number().int().positive("Invalid care type"),
+  });
 
 export async function GET() {
     try {
@@ -13,23 +26,26 @@ export async function GET() {
     }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     try {
-        const { name, lastName, zipCode, careTypeId } = await req.json();
+        const body = await req.json();
 
-        if (!name || !lastName || !zipCode || !careTypeId) {
+        if (!body.name || !body.lastName || !body.zipCode || !body.careTypeId) {
             return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
         }
+
+        // ✅ Validate request data using Zod
+        const validatedData = patientSchema.parse(body);
 
         let status= false;
         let success = false;
         let message = "";
 
-        if(careTypeId !== 4){
+        if(validatedData.careTypeId !== 4){
             const facilities = await db.facility.findMany({
                 where: { 
                     OR: [
-                        {careTypeId},
+                        {careTypeId: validatedData.careTypeId},
                         {careTypeId: 3},
                     ],
                     AND:[
@@ -39,8 +55,8 @@ export async function POST(req: Request) {
             });
             
             for( const facility of facilities ){
-                if(zipCode <= facility.servesCodeMax && zipCode >= facility.servesCodeMin){
-                    if(Math.abs(zipCode - facility.zipCode) <= 3000){
+                if(validatedData.zipCode <= facility.servesCodeMax && validatedData.zipCode >= facility.servesCodeMin){
+                    if(Math.abs(validatedData.zipCode - facility.zipCode) <= 3000){
                         status= true;
                         success = true;
                         message = 'Matching facility found! with Facility: ' + facility.name;
@@ -60,10 +76,10 @@ export async function POST(req: Request) {
 
         const newPatient = await db.patient.create({
             data: { 
-                name: name, 
-                lastName: lastName, 
-                zipCode: zipCode, 
-                careTypeId: careTypeId, 
+                name: validatedData.name, 
+                lastName: validatedData.lastName, 
+                zipCode: validatedData.zipCode, 
+                careTypeId: validatedData.careTypeId, 
                 matchStatus: status 
             },
         });
@@ -74,6 +90,10 @@ export async function POST(req: Request) {
         });
         
     } catch (error) {
+        if (error instanceof z.ZodError) {
+            // ❌ Return validation errors
+            return NextResponse.json({ errors: error.errors }, { status: 400 });
+          }
         console.error('Error processing patient:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
