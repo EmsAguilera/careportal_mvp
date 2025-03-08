@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -42,7 +42,7 @@ export default function Matches() {
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-sky-500 via-violet-600 to-fuchsia-600">
       <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md h-[550px] flex flex-col">
         <Image src="/CareMatesLogo.png" alt="CareMates Logo" className="mx-auto mb-6" width={240} height={100} priority />
-
+        <Suspense>
         {loading ? (
           <div className="mt-4 flex flex-col items-center">
             <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
@@ -76,6 +76,7 @@ export default function Matches() {
           </button>
         </div>
         )}
+        </Suspense>
       </div>
     </div>
   );
