@@ -33,10 +33,19 @@ const MultiStepForm = () => {
     const fetchCareTypes = async () => {
       try {
         const response = await fetch("/api/caretypes");
+        if (!response.ok) {
+          throw new Error("Failed to fetch care types");
+        }
         const data = await response.json();
-        setCareTypes(data);
+        if (Array.isArray(data)) {
+          setCareTypes(data);
+        } else {
+          console.error("Invalid data format:", data);
+          setCareTypes([]);
+        }
       } catch (error) {
         console.error("Failed to load care types", error);
+        setCareTypes([]);
       }
     };
     fetchCareTypes();
@@ -156,7 +165,7 @@ const MultiStepForm = () => {
               className="w-full p-3 bg-gray-100 border rounded-2xl"
             >
               <option value="">Select</option>
-              {careTypes.map((type) => (
+              {Array.isArray(careTypes) && careTypes.map((type) => (
                 <option key={type.id} value={type.id}>
                   {type.name}
                 </option>
