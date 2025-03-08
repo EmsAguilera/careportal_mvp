@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function Matches() {
   const searchParams = useSearchParams();
@@ -10,7 +11,6 @@ export default function Matches() {
   const patientId = searchParams.get('id');
 
   const [facilityName, setFacilityName] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
   const [isMatched, setIsMatched] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -27,13 +27,11 @@ export default function Matches() {
           setFacilityName(data.facilityName);
         } else {
           setIsMatched(false);
-          setMessage(data.message || 'No facility matched your criteria.');
         }
       } catch (error) {
         console.error('Error fetching facility:', error);
-        setMessage('Something went wrong.');
       } finally {
-        setLoading(false); // Stop loading
+        setLoading(false);
       }
     };
 
@@ -43,7 +41,7 @@ export default function Matches() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-sky-500 via-violet-600 to-fuchsia-600">
       <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md h-[550px] flex flex-col">
-        <img src="/CareMatesLogo.png" alt="CareMates Logo" className="w-60 mx-auto mb-6" />
+        <Image src="/CareMatesLogo.png" alt="CareMates Logo" className="mx-auto mb-6" width={240} height={100} priority />
 
         {loading ? (
           <div className="mt-4 flex flex-col items-center">

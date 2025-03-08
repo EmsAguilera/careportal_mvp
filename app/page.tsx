@@ -1,5 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function Home() {
   const router = useRouter();
@@ -7,7 +8,7 @@ export default function Home() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-sky-500 via-violet-600 to-fuchsia-600">
       <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md h-[550px] flex flex-col">
-        <img src="/CareMatesLogo.png" alt="CareMates Logo" className="w-60 mx-auto mb-6" />
+        <Image src="/CareMatesLogo.png" alt="CareMates Logo" className="mx-auto mb-6" width={240} height={100} priority />
         <h1 className="text-2xl font-semibold text-gray-800 mb-4">Welcome to CarePortal MVP</h1>
         <p className="text-gray-600 mb-6">
           This portal allows patients to register and find the best care facility based on their location

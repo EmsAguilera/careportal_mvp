@@ -1,9 +1,6 @@
 import { db } from '@/lib/prisma';
-import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-
-const prisma = new PrismaClient();
 
 const patientSchema = z.object({
     name: z.string().min(1, "First name is required"),
@@ -22,6 +19,7 @@ export async function GET() {
 
         return NextResponse.json({ patients });
     } catch (error) {
+        console.error("Error fetching patients:", error);
         return NextResponse.json({ error: 'Failed to fetch patients' }, { status: 500 });
     }
 }

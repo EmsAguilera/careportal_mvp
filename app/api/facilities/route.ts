@@ -10,6 +10,7 @@ export async function GET() {
 
         return NextResponse.json({ facilities });
     } catch (error) {
+        console.error("Error fetching facilities:", error);
         return NextResponse.json({ error: 'Failed to fetch facilities' }, { status: 500 });
     }
 }

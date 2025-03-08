@@ -2,12 +2,19 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { log } from "console";
+import Image from "next/image";
 
 interface CareType {
   id: string;
   name: string;
 }
+
+type ValidationErrors = {
+  name?: string;
+  lastName?: string;
+  zipCode?: string;
+  careTypeId?: string;
+};
 
 const MultiStepForm = () => {
   const [step, setStep] = useState(1);
@@ -17,7 +24,6 @@ const MultiStepForm = () => {
   const [careTypeId, setCareTypeId] = useState<number | "">("");
   const [careTypes, setCareTypes] = useState<CareType[]>([]);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
 
   const [errors, setErrors] = useState<{ name?: string; lastName?: string; zipCode?: string; careTypeId?: string }>({});
   const router = useRouter();
@@ -39,7 +45,7 @@ const MultiStepForm = () => {
   const stepTitles = ["Personal Info", "Type of Care", "Address"];
 
   const validateStep1 = () => {
-    let errors: any = {};
+    const errors: ValidationErrors = {};
     if (!name.trim()) errors.name = "First name is required";
     if (!lastName.trim()) errors.lastName = "Last name is required";
     setErrors(errors);
@@ -47,14 +53,14 @@ const MultiStepForm = () => {
   };
 
   const validateStep2 = () => {
-    let errors: any = {};
+    const errors: ValidationErrors = {};
     if (!careTypeId) errors.careTypeId = "Please select a type of care";
     setErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const validateStep3 = () => {
-    let errors: any = {};
+    const errors: ValidationErrors = {};
     if (!zipCode) errors.zipCode = "Zipcode is required";
     else if (zipCode.toString().length !== 5 || isNaN(Number(zipCode))) errors.zipCode = "Zipcode must be exactly 5 digits";
     setErrors(errors);
@@ -88,7 +94,6 @@ const MultiStepForm = () => {
       router.push(`/matches?id=${encodeURIComponent(data.patient.id)}`);
       
     } catch (error) {
-      setMessage("Error submitting form");
       console.error("Form submission error:", error);
     } finally {
       setLoading(false);
@@ -99,7 +104,7 @@ const MultiStepForm = () => {
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-sky-500 via-violet-600 to-fuchsia-600">
       <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md h-[550px] flex flex-col">
         {/* Image above the steps */}
-        <img src="/CareMatesLogo.png" alt="CareMates Logo" className="w-60 mx-auto mb-6" />
+        <Image src="/CareMatesLogo.png" alt="CareMates Logo" className="mx-auto mb-6" width={240} height={100} priority />
 
         {/* Progress Steps */}
         <div className="flex justify-between mb-6">
