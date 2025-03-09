@@ -14,7 +14,6 @@ export default function Home() {
           This portal allows patients to register and find the best care facility based on their location
           and needs. Click the button below to get started.
         </p>
-        
 
         {/* Buttons */}
         <div className="mt-auto flex justify-between">
@@ -25,7 +24,6 @@ export default function Home() {
               Start
             </button>
         </div>
-
       </div>
     </div>
   );

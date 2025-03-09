@@ -28,7 +28,6 @@ const MultiStepForm = () => {
   const [errors, setErrors] = useState<{ name?: string; lastName?: string; zipCode?: string; careTypeId?: string }>({});
   const router = useRouter();
 
-  // Fetch care types on component mount
   useEffect(() => {
     const fetchCareTypes = async () => {
       try {
@@ -69,8 +68,9 @@ const MultiStepForm = () => {
   };
 
   const validateStep3 = () => {
+    if (careTypeId === 4) return true;
     const errors: ValidationErrors = {};
-    if (!zipCode) errors.zipCode = "Zipcode is required";
+    if (!zipCode) errors.zipCode = "Zip Code is required";
     else if (zipCode.toString().length !== 5 || isNaN(Number(zipCode))) errors.zipCode = "Zipcode must be exactly 5 digits";
     setErrors(errors);
     return Object.keys(errors).length === 0;
@@ -78,11 +78,16 @@ const MultiStepForm = () => {
 
   const handleNext = () => {
     if (step === 1 && validateStep1()) setStep(2);
-    if (step === 2 && validateStep2()) setStep(3);
+    if (step === 2 && validateStep2()) {
+      if (careTypeId === 4){
+        handleSubmit();
+      } else {
+        setStep(3);
+      }
+    }
     if (step === 3 && validateStep3()) handleSubmit();
   };
 
-  // Handle form submission
   const handleSubmit = async () => {
     setLoading(true);
     try {
@@ -97,9 +102,6 @@ const MultiStepForm = () => {
       }
 
       const data = await response.json();
-      console.log(data);
-      
-      
       router.push(`/matches?id=${encodeURIComponent(data.patient.id)}`);
       
     } catch (error) {
@@ -112,10 +114,9 @@ const MultiStepForm = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-sky-500 via-violet-600 to-fuchsia-600">
       <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md h-[550px] flex flex-col">
-        {/* Image above the steps */}
         <Image src="/CareMatesLogo.png" alt="CareMates Logo" className="mx-auto mb-6" width={240} height={100} priority />
 
-        {/* Progress Steps */}
+        {/* Steps */}
         <div className="flex justify-between mb-6">
           {[1, 2, 3].map((num, index) => (
             <div key={num} className="flex flex-col items-center">
@@ -131,7 +132,7 @@ const MultiStepForm = () => {
           ))}
         </div>
 
-        <h2 className="text-xl font-semibold mb-4">Registration</h2>
+        <h2 className="text-xl font-semibold mb-4 text-gray-900 appearance-none">Registration</h2>
 
         {/* Form Content */}
         {step === 1 && (
@@ -141,7 +142,7 @@ const MultiStepForm = () => {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded text-gray-900 appearance-none"
             />
             {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
 
@@ -150,7 +151,7 @@ const MultiStepForm = () => {
               type="text"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded text-gray-900 appearance-none"
             />
             {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName}</p>}
           </div>
@@ -162,7 +163,7 @@ const MultiStepForm = () => {
             <select
               value={careTypeId}
               onChange={(e) => setCareTypeId(Number(e.target.value) || "")}
-              className="w-full p-3 bg-gray-100 border rounded-2xl"
+              className="w-full p-3 bg-gray-100 border rounded-2xl text-gray-900 appearance-none"
             >
               <option value="">Select</option>
               {Array.isArray(careTypes) && careTypes.map((type) => (
@@ -182,7 +183,7 @@ const MultiStepForm = () => {
               type="number"
               value={zipCode}
               onChange={(e) => setZipCode(Number(e.target.value) || "")}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded text-gray-900 appearance-none"
             />
             {errors.zipCode && <p className="text-red-500 text-sm">{errors.zipCode}</p>}
           </div>
@@ -196,10 +197,20 @@ const MultiStepForm = () => {
             </button>
           )}
 
-          {step < 3 && (
-            <button onClick={handleNext} className="bg-purple-600 text-white px-4 py-2 rounded shadow-lg hover:bg-purple-800 transition duration-300">
-              Next
+          {step === 2 && careTypeId === 4 ? (
+             <button
+              onClick={handleNext}
+              className="bg-indigo-500 text-white px-4 py-2 rounded shadow-lg shadow-indigo-500/50 hover:bg-indigo-700 transition duration-300"
+              disabled={loading}
+            >
+              {loading ? "Submitting..." : "Submit"}
             </button>
+          ) : (
+            step < 3 && (
+              <button onClick={handleNext} className="bg-purple-600 text-white px-4 py-2 rounded shadow-lg hover:bg-purple-800 transition duration-300">
+                Next
+              </button>
+            )
           )}
 
           {step === 3 && (

@@ -14,6 +14,11 @@ function MatchesContent() {
   const [isMatched, setIsMatched] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const [patientLastName, setLastName] = useState<string | null>(null);
+  const [patientZipCode, setPatientZipCode] = useState<string | null>(null);
+  const [careTypeId, setCareTypeId] = useState<number | null>(null);
+  const [facilityZipCode, setFacilityZipCode] = useState<string | null>(null);
+
   useEffect(() => {
     if (!patientId) return;
 
@@ -22,9 +27,14 @@ function MatchesContent() {
         const response = await fetch(`/api/matches?id=${patientId}`);
         const data = await response.json();
 
+        setLastName(data.patient.lastName);
+        setPatientZipCode(data.patient.zipCode);
+        setCareTypeId(data.patient.careTypeId);
+        
         if (data.facilityName) {
           setIsMatched(true);
           setFacilityName(data.facilityName);
+          setFacilityZipCode(data.patient.facility.zipCode);
         } else {
           setIsMatched(false);
         }
@@ -51,12 +61,20 @@ function MatchesContent() {
         ) : (
           <div>
             <h1 className="text-2xl font-semibold text-gray-800 mb-4">
-              {isMatched ? "Care facility found!" : "No Match Found"}
+              {isMatched ? "Care Facility Found!" : "No Care Facility Found"}
             </h1>
             <p className="text-gray-600 mb-6">
-              {facilityName
-                ? `You have been matched with care facility ${facilityName}.`
-                : "Unfortunately, we couldn't find a matching care facility for you."}
+              {isMatched && (
+                `We have good news for you Mr/Ms. ${patientLastName}. You have been matched with care facility ${facilityName} at location ${facilityZipCode}.`
+              )}
+
+              {!isMatched && careTypeId !== 4 && (
+                `Unfortunately, we couldn't find a matching care facility for you Mr/Ms. ${patientLastName}. The available care facilities either do not cover your area or are far from your location: ${patientZipCode}.`
+              )}
+
+              {!isMatched && careTypeId === 4 && (
+                `Unfortunately, the current facilities do not provide Day Care and we couldn't find a matching care facility for you ${patientLastName}.`
+              )}
             </p>
           </div>
         )}
